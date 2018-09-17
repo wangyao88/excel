@@ -1,15 +1,9 @@
 package com.drgs.utils.excel.convert;
 
-import com.drgs.utils.excel.annotation.ExcelCell;
-import com.drgs.utils.excel.annotation.ExcelDateCell;
-import com.drgs.utils.excel.annotation.ExcelImplicit;
-import com.drgs.utils.excel.annotation.ExcelSingleCellImplicit;
 import com.drgs.utils.excel.bean.Bean;
+import com.drgs.utils.excel.configure.ConfiguraterManager;
 import com.drgs.utils.excel.exception.FileNotExistsException;
 import com.drgs.utils.excel.exception.NotExcelFileException;
-import com.drgs.utils.excel.strategy.DateParseStrategy;
-import com.drgs.utils.excel.strategy.ParseStrategy;
-import com.drgs.utils.excel.strategy.RangeParseStrategy;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -27,8 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * excel javaBean转换器
@@ -126,51 +121,7 @@ public class ExcelConveter {
             int arrLength = arr.length;
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
-                if (field.isAnnotationPresent(ExcelCell.class)) {
-                    field.setAccessible(true);
-                    ExcelCell excelCell = field.getAnnotation(ExcelCell.class);
-                    int position = excelCell.position();
-                    Object value = StringUtils.EMPTY;
-                    if(position < arrLength){
-                        value = arr[position];
-                    }
-                    Type genericType = field.getGenericType();
-                    field.set(entity, configurateValue(genericType.getTypeName(), value+StringUtils.EMPTY));
-                    continue;
-                }
-                if (field.isAnnotationPresent(ExcelDateCell.class)) {
-                    field.setAccessible(true);
-                    ExcelDateCell excelDateCell = field.getAnnotation(ExcelDateCell.class);
-                    int position = excelDateCell.position();
-                    Object value = null;
-                    if(position < arrLength){
-                        value = arr[position];
-                    }
-                    DateParseStrategy dateParseStrategy = new DateParseStrategy();
-                    field.set(entity, dateParseStrategy.parse(value));
-                    continue;
-                }
-                if (field.isAnnotationPresent(ExcelSingleCellImplicit.class)) {
-                    field.setAccessible(true);
-                    ExcelSingleCellImplicit excelSingleCellImplicit = field.getAnnotation(ExcelSingleCellImplicit.class);
-                    Class<?> cellType = excelSingleCellImplicit.type();
-                    int position = excelSingleCellImplicit.position();
-                    Object value = null;
-                    if(position < arrLength){
-                        value = arr[position];
-                    }
-                    field.set(entity, configurateBeanValue(cellType, value+StringUtils.EMPTY));
-                    continue;
-                }
-
-                if (field.isAnnotationPresent(ExcelImplicit.class)) {
-                    field.setAccessible(true);
-                    ExcelImplicit excelImplicit = field.getAnnotation(ExcelImplicit.class);
-                    Class<? extends RangeParseStrategy> parseStrategy = excelImplicit.parseStrategy();
-                    RangeParseStrategy rangeParseStrategy = parseStrategy.newInstance();
-                    Object parse = rangeParseStrategy.parse(arr);
-                    field.set(entity, parse);
-                }
+                ConfiguraterManager.configurate(entity,field,arr);
             }
             return entity;
         } catch (Exception e) {
@@ -179,69 +130,10 @@ public class ExcelConveter {
         return null;
     }
 
-    private static <T> T configurateBeanValue(Class<T> cellType, String value) {
-        T obj = null;
-        try {
-            obj = cellType.newInstance();
-            Field[] fields = cellType.getDeclaredFields();
-            Field firstField = fields[0];
-            Type genericType = firstField.getGenericType();
-            Class<?> declaringClass = firstField.getDeclaringClass();
-            firstField.setAccessible(true);
-            firstField.set(obj,configurateValue(genericType.getTypeName(),value));
-        } catch (Exception e) {
-            log.error("转化嵌套实体对象失败",e);
-        }
-        return obj;
-    }
-
-    private static Date configurateDateValue(Object value) {
-        return (Date)value;
-    }
-
-    private static <T> T configurateValue(Class<T> cellType, String value) {
-        Object obj = configurateValue(cellType.getName(), value);
-        return Objects.isNull(obj) ? cellType.cast(value) : (T)obj;
-    }
-
-    private static <T> T configurateValue(String cellTypeName, String value) {
-        if(cellTypeName.equals(String.class.getName())) {
-            return (T)String.valueOf(value);
-        }
-        if(cellTypeName.equals(Integer.class.getName()) || cellTypeName.equals(int.class.getName())) {
-            if (value.contains(".")) {
-                value = value.substring(0, value.lastIndexOf("."));
-            }
-            return (T)Integer.valueOf(value);
-        }
-        if(cellTypeName.equals(Long.class.getName()) || cellTypeName.equals(long.class.getName())) {
-            if (value.contains(".")) {
-                value = value.substring(0, value.lastIndexOf("."));
-            }
-            return (T)Long.valueOf(value);
-        }
-        if(cellTypeName.equals(Double.class.getName()) || cellTypeName.equals(double.class.getName())) {
-            return (T)Double.valueOf(value);
-        }
-        if(cellTypeName.equals(Float.class.getName()) || cellTypeName.equals(float.class.getName())) {
-            return (T)Float.valueOf(value);
-        }
-        if(cellTypeName.equals(Boolean.class.getName()) || cellTypeName.equals(boolean.class.getName())) {
-            if(StringUtils.isEmpty(value)){
-                return (T)Boolean.FALSE;
-            }
-            if("true".equals(value.toLowerCase().trim()) || "1.0".equals(value.trim())){
-                return (T)Boolean.TRUE;
-            }
-        }
-        return null;
-    }
-
-
     public static void main(String[] args) {
-        String path = "/Users/localadmin/Documents/temp/test.xlsx";
+//        String path = "/Users/localadmin/Documents/temp/test.xlsx";
+        String path = "F:/cache/test.xlsx";
         List<Bean> beans = ExcelConveter.getBeans(path, Bean.class);
         System.out.println(beans);
     }
-
 }
