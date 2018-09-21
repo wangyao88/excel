@@ -6,6 +6,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+/**
+ * @author wangyao
+ */
 public class ConfiguraterManager {
 
     public static <T> void configurate (T entity, Field field, Object[] row){
