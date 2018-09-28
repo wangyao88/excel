@@ -2,8 +2,8 @@ package com.drgs.utils.excel.configure;
 
 import com.drgs.utils.excel.bean.ValidateResult;
 import com.drgs.utils.excel.exception.ValidateException;
-import com.drgs.utils.excel.validator.IntegerAngLongValidator;
 import com.drgs.utils.excel.validator.FloatAndDoubleValidator;
+import com.drgs.utils.excel.validator.IntegerAngLongValidator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;

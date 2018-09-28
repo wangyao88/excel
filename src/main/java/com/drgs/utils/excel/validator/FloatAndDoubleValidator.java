@@ -2,17 +2,18 @@ package com.drgs.utils.excel.validator;
 
 import com.drgs.utils.excel.bean.ValidateResult;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
  * @author wangyao
  */
-public class FloatAndDoubleValidator implements Validator {
+public class FloatAndDoubleValidator implements Function {
 
     private static final Pattern PATTERN = Pattern.compile("^[-\\+]?[.\\d]*$");
 
     @Override
-    public ValidateResult validate(Object value) {
+    public ValidateResult apply(Object value) {
         if(isFloatOrDouble(value+"")) {
             return ValidateResult.buildSuccessValidateResult();
         }

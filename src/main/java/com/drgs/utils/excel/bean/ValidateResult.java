@@ -21,9 +21,14 @@ public class ValidateResult {
     }
 
     public static ValidateResult buildSuccessValidateResult(String msg){
+        return buildSuccessValidateResult(msg,null);
+    }
+
+    public static ValidateResult buildSuccessValidateResult(String msg, Object data){
         ValidateResult validateResult = new ValidateResult();
         validateResult.setResult(true);
         validateResult.setMsg(msg);
+        validateResult.setData(data);
         return validateResult;
     }
 
