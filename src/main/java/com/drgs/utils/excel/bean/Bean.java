@@ -1,13 +1,12 @@
 package com.drgs.utils.excel.bean;
 
-import com.drgs.utils.excel.annotation.ExcelCell;
-import com.drgs.utils.excel.annotation.ExcelDateCell;
-import com.drgs.utils.excel.annotation.ExcelImplicit;
-import com.drgs.utils.excel.annotation.ExcelSingleCellImplicit;
+import com.drgs.utils.excel.annotation.*;
+import com.drgs.utils.excel.strategy.DataRangeParseStrategy;
 import com.drgs.utils.excel.strategy.FooRangeParseStrategy;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class Bean {
@@ -27,6 +26,9 @@ public class Bean {
     @ExcelDateCell(position = 4, partten = "yyyy/MM/dd")
     private Date birthDay;
 
-    @ExcelImplicit(parseStrategy = FooRangeParseStrategy.class)
+    @ExcelRangeImplicit(parseStrategy = FooRangeParseStrategy.class)
     private Foo foo;
+
+    @ExcelRangeImplicit(parseStrategy = DataRangeParseStrategy.class)
+    private List<String> data;
 }

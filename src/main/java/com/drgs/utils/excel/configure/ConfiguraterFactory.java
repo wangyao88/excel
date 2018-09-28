@@ -2,7 +2,7 @@ package com.drgs.utils.excel.configure;
 
 import com.drgs.utils.excel.annotation.ExcelCell;
 import com.drgs.utils.excel.annotation.ExcelDateCell;
-import com.drgs.utils.excel.annotation.ExcelImplicit;
+import com.drgs.utils.excel.annotation.ExcelRangeImplicit;
 import com.drgs.utils.excel.annotation.ExcelSingleCellImplicit;
 import com.google.common.collect.Maps;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class ConfiguraterFactory {
         configuraters.put(ExcelCell.class, new ExcelCellConfigurater());
         configuraters.put(ExcelDateCell.class, new ExcelDateCellConfigurater());
         configuraters.put(ExcelSingleCellImplicit.class, new ExcelSingleCellImplicitConfigurater());
-        configuraters.put(ExcelImplicit.class, new ExcelImplicitConfigurater());
+        configuraters.put(ExcelRangeImplicit.class, new ExcelRangeImplicitConfigurater());
     }
 
     private static class Singleton {
