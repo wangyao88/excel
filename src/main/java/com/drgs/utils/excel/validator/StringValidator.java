@@ -12,6 +12,6 @@ public class StringValidator implements Function {
 
     @Override
     public ValidateResult apply(Object value) {
-        return ValidateResult.buildSuccessValidateResult("",value);
+        return ValidateResult.buildSuccessValidateResult("",String.valueOf(value));
     }
 }
