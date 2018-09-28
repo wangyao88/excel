@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author wangyao
@@ -45,5 +46,20 @@ public class Excel {
             return new HSSFWorkbook(fileInputStream);
         }
         return new XSSFWorkbook(fileInputStream);
+    }
+
+    public static void main(String[] args) {
+        String str = "-.1";
+        System.out.println(isInteger(str));
+        System.out.println(Double.valueOf(str));
+
+    }
+
+    public static boolean isInteger(String str) {
+        if("-".equals(str) || "+".equals(str)){
+            return false;
+        }
+        Pattern pattern = Pattern.compile("^[-\\+]?[.\\d]*$");
+        return pattern.matcher(str).matches();
     }
 }

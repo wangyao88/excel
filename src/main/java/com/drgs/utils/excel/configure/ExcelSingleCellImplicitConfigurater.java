@@ -14,36 +14,27 @@ import java.lang.reflect.Type;
 public class ExcelSingleCellImplicitConfigurater implements Configurater {
 
     @Override
-    public <T> void configure(T entity, Field field, Object[] row) {
-        try {
-            field.setAccessible(true);
-            ExcelSingleCellImplicit excelSingleCellImplicit = field.getAnnotation(ExcelSingleCellImplicit.class);
-            Class<?> cellType = excelSingleCellImplicit.type();
-            int position = excelSingleCellImplicit.position();
-            Object value = null;
-            int arrLength = row.length;
-            if(position < arrLength){
-                value = row[position];
-            }
-            field.set(entity, configurateBeanValue(cellType, value+StringUtils.EMPTY));
-        } catch (Exception e) {
-            log.error("设置属性值失败",e);
+    public <T> void configure(T entity, Field field, Object[] row) throws Exception{
+        field.setAccessible(true);
+        ExcelSingleCellImplicit excelSingleCellImplicit = field.getAnnotation(ExcelSingleCellImplicit.class);
+        Class<?> cellType = excelSingleCellImplicit.type();
+        int position = excelSingleCellImplicit.position();
+        Object value = null;
+        int arrLength = row.length;
+        if(position < arrLength){
+            value = row[position];
         }
+        field.set(entity, configurateBeanValue(cellType, value+StringUtils.EMPTY));
     }
 
-    private static <T> T configurateBeanValue(Class<T> cellType, String value) {
-        T obj = null;
-        try {
-            obj = cellType.newInstance();
-            Field[] fields = cellType.getDeclaredFields();
-            Field firstField = fields[0];
-            Type genericType = firstField.getGenericType();
-            Class<?> declaringClass = firstField.getDeclaringClass();
-            firstField.setAccessible(true);
-            firstField.set(obj,Configurater.configurateValue(genericType.getTypeName(),value));
-        } catch (Exception e) {
-            log.error("转化嵌套实体对象失败",e);
-        }
+    private static <T> T configurateBeanValue(Class<T> cellType, String value) throws Exception {
+        T obj = cellType.newInstance();
+        Field[] fields = cellType.getDeclaredFields();
+        Field firstField = fields[0];
+        Type genericType = firstField.getGenericType();
+        Class<?> declaringClass = firstField.getDeclaringClass();
+        firstField.setAccessible(true);
+        firstField.set(obj,Configurater.configurateValue(genericType.getTypeName(),value));
         return obj;
     }
 }

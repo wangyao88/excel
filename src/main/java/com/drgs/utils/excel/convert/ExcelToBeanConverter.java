@@ -1,33 +1,27 @@
 package com.drgs.utils.excel.convert;
 
-import com.drgs.utils.excel.bean.Bean;
-import com.drgs.utils.excel.bean.Coordinate;
-import com.drgs.utils.excel.bean.Point;
-import com.drgs.utils.excel.bean.Result;
+import com.drgs.utils.excel.bean.*;
 import com.drgs.utils.excel.configure.ConfiguraterManager;
 import com.drgs.utils.excel.exception.FileNotExistsException;
 import com.drgs.utils.excel.exception.NotExcelFileException;
+import com.drgs.utils.excel.validator.Validator;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import lombok.Cleanup;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author wangyao
@@ -37,6 +31,7 @@ import java.util.Set;
 public class ExcelToBeanConverter {
 
     private List<Coordinate> coordinates = Lists.newArrayList();
+    private List<Validator> validators = Lists.newArrayList();
 
     public static ExcelToBeanConverter getInstance() {
         ExcelToBeanConverter excelToBeanConverter = new ExcelToBeanConverter();
@@ -51,6 +46,11 @@ public class ExcelToBeanConverter {
 
     public ExcelToBeanConverter setCoordinates(List<Coordinate> coordinates) {
         this.coordinates = coordinates;
+        return this;
+    }
+
+    public ExcelToBeanConverter setValidators(List<Validator> validators) {
+        this.validators = validators;
         return this;
     }
 
@@ -103,7 +103,20 @@ public class ExcelToBeanConverter {
         for (int i = coordinate.getStartRowIndex(); i <= lastRowNum; i++) {
             Point point = Point.getInstance(sheetIndex,i);
             try {
+                boolean validateFlag = true;
                 T t = parseBean(clazz, sheet, i);
+                for(Validator validator : validators){
+                    ValidateResult validateResult = validator.validate(t);
+                    if(!validateResult.isResult()) {
+                        result.getFailureBeans().put(point,validateResult.getCause().getMessage());
+                        result.setSuccess(false);
+                        validateFlag = false;
+                        break;
+                    }
+                }
+                if(!validateFlag){
+                    continue;
+                }
                 result.getSuccessBeans().put(point,t);
             } catch (Exception e) {
                 result.getFailureBeans().put(point,e.getMessage());

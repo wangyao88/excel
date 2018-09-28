@@ -1,7 +1,5 @@
 package com.drgs.utils.excel.configure;
 
-import com.drgs.utils.excel.annotation.ExcelSingleCellImplicit;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -11,12 +9,12 @@ import java.util.Map;
  */
 public class ConfiguraterManager {
 
-    public static <T> void configurate (T entity, Field field, Object[] row){
+    public static <T> void configurate (T entity, Field field, Object[] row) throws Exception{
         Map<Class<? extends Annotation>, Configurater> configuraters = ConfiguraterFactory.getInstance().getConfiguraters();
-        configuraters.forEach((key,value) -> {
-            if (field.isAnnotationPresent(key)){
-                value.configure(entity,field,row);
+        for(Map.Entry<Class<? extends Annotation>, Configurater> entry : configuraters.entrySet()) {
+            if (field.isAnnotationPresent(entry.getKey())){
+                entry.getValue().configure(entity,field,row);
             }
-        });
+        }
     }
 }
