@@ -11,7 +11,7 @@ public interface Configurater {
 
     <T> void configure(T entity, Field field, Object[] row);
 
-    static <T> T configurateValue(String cellTypeName, String value) {
+    static <T> T configurateValue(String cellTypeName, String value){
         if(cellTypeName.equals(String.class.getName())) {
             return (T)String.valueOf(value);
         }
