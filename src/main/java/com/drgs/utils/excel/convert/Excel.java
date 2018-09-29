@@ -2,19 +2,25 @@ package com.drgs.utils.excel.convert;
 
 import com.drgs.utils.excel.exception.FileNotExistsException;
 import com.drgs.utils.excel.exception.NotExcelFileException;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
+import java.util.function.Function;
 
 /**
  * @author wangyao
@@ -23,6 +29,14 @@ import java.util.regex.Pattern;
 public class Excel {
 
     private static final Set<String> EXTENSION = Sets.newHashSet(".xls","xlsx");
+    private static final Map<Integer, Function<Cell,Object>> CELL_TYPE_FUNCTION = Maps.newHashMap();
+
+    static {
+        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_STRING, (cell) -> cell.getStringCellValue());
+        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_BOOLEAN, (cell) -> cell.getBooleanCellValue());
+        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_BLANK, (cell) -> StringUtils.EMPTY);
+        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_NUMERIC, (cell) -> HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue());
+    }
 
     public static Optional<Workbook> getWorkbook(File file) throws FileNotExistsException, NotExcelFileException {
         if (!file.exists()) {
@@ -48,18 +62,15 @@ public class Excel {
         return new XSSFWorkbook(fileInputStream);
     }
 
-    public static void main(String[] args) {
-        String str = "-.1";
-        System.out.println(isInteger(str));
-        System.out.println(Double.valueOf(str));
-
-    }
-
-    public static boolean isInteger(String str) {
-        if("-".equals(str) || "+".equals(str)){
-            return false;
+    public static Object getCellValue(Cell cell) {
+        if(Objects.isNull(cell)){
+            return StringUtils.EMPTY;
         }
-        Pattern pattern = Pattern.compile("^[-\\+]?[.\\d]*$");
-        return pattern.matcher(str).matches();
+        int cellType = cell.getCellType();
+        if(!CELL_TYPE_FUNCTION.containsKey(cellType)){
+            return StringUtils.EMPTY;
+        }
+        return CELL_TYPE_FUNCTION.get(cellType).apply(cell);
     }
+
 }

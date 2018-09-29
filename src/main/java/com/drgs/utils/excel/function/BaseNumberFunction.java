@@ -50,16 +50,16 @@ public abstract class BaseNumberFunction implements Function {
     protected abstract boolean isValida(String value);
 
     protected boolean isIntegerOrLong(String value) {
-        if("-".equals(value) || "+".equals(value)){
-            return false;
-        }
+        if (equalsPlusOrMinus(value)) return false;
         return INTEGER_LONG_PATTERN.matcher(value).matches();
     }
 
     protected boolean isFloatOrDouble(String value) {
-        if("-".equals(value) || "+".equals(value)){
-            return false;
-        }
+        if (equalsPlusOrMinus(value)) return false;
         return FLOAT_DOUBLE_PATTERN.matcher(value).matches();
+    }
+
+    private boolean equalsPlusOrMinus(String value) {
+        return "-".equals(value) || "+".equals(value);
     }
 }

@@ -10,8 +10,6 @@ import com.google.common.io.Files;
 import lombok.Cleanup;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -71,15 +69,14 @@ public class ExcelToBeanConverter {
     }
 
     public <T> Result<T> getBeans(File file, Class<T> clazz) {
+        Result<T> result = new Result<T>();
         Optional<Workbook> workbookOptional = Optional.empty();
         try {
             workbookOptional = Excel.getWorkbook(file);
-        } catch (FileNotExistsException e) {
+        } catch (FileNotExistsException | NotExcelFileException e) {
             log.error(e.getMessage(),e);
-        } catch (NotExcelFileException e) {
-            log.error(e.getMessage(),e);
+            return result;
         }
-        Result<T> result = new Result<T>();
         if(workbookOptional.isPresent()) {
             Workbook workbook = workbookOptional.get();
             this.getCoordinates().forEach(coordinate -> {
@@ -142,27 +139,10 @@ public class ExcelToBeanConverter {
     private Object[] convertArrayByRow(Row row) throws Exception{
         int cols = row.getLastCellNum();
         Object[] arr = new Object[cols];
+        Cell cell;
         for (int i = 0; i < cols; i++) {
-            Cell cell = row.getCell(i);
-            if(cell == null || cell.getCellType() == Cell.CELL_TYPE_BLANK){
-                arr[i] = StringUtils.EMPTY;
-                continue;
-            }
-            if(cell.getCellType() == Cell.CELL_TYPE_STRING){
-                arr[i] = cell.getStringCellValue();
-                continue;
-            }
-            if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-                if(HSSFDateUtil.isCellDateFormatted(cell)) {
-                    arr[i] = cell.getDateCellValue();
-                }else {
-                    arr[i] = cell.getNumericCellValue();
-                }
-                continue;
-            }
-            if(cell.getCellType() == Cell.CELL_TYPE_BOOLEAN){
-                arr[i] = cell.getBooleanCellValue();
-            }
+            cell = row.getCell(i);
+            arr[i] = Excel.getCellValue(cell);
         }
         return arr;
     }
