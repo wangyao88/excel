@@ -2,7 +2,10 @@ package com.drgs.utils.excel.validator;
 
 import com.drgs.utils.excel.bean.ValidateResult;
 
-public interface Validator {
+/**
+ * @author wangyao
+ */
+public interface Validator<T> {
 
-    ValidateResult validate(Object value);
+    ValidateResult validate(T value);
 }

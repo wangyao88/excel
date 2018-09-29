@@ -2,7 +2,7 @@ package com.drgs.utils.excel.configure;
 
 import com.drgs.utils.excel.bean.ValidateResult;
 import com.drgs.utils.excel.exception.ValidateException;
-import com.drgs.utils.excel.validator.ValidatorManager;
+import com.drgs.utils.excel.function.FunctionManager;
 
 import java.lang.reflect.Field;
 
@@ -14,7 +14,7 @@ public interface Configurater {
     <T> void configure(T entity, Field field, Object[] row) throws Exception;
 
     static <T> T configurateValue(String cellTypeName, String value) throws Exception{
-        ValidateResult validateResult = ValidatorManager.getInstance().doValidate(cellTypeName, value);
+        ValidateResult validateResult = FunctionManager.getInstance().doValidate(cellTypeName, value);
         if(validateResult.isResult()) {
             return (T)validateResult.getData();
         }

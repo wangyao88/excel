@@ -17,8 +17,8 @@ public class Bean {
     @ExcelSingleCellImplicit(position = 1, type = Age.class)
     private Age age;
 
-    @ExcelCell(position = 2)
-    private double cost;
+    @ExcelCell(position = 2, nullable = false)
+    private Double cost;
 
     @ExcelCell(position = 3)
     private boolean success;

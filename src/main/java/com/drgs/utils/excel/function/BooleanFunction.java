@@ -1,7 +1,6 @@
-package com.drgs.utils.excel.validator;
+package com.drgs.utils.excel.function;
 
 import com.drgs.utils.excel.bean.ValidateResult;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -9,7 +8,7 @@ import java.util.function.Function;
 /**
  * @author wangyao
  */
-public class BooleanValidator implements Function {
+public class BooleanFunction implements Function {
 
     @Override
     public ValidateResult apply(Object value) {

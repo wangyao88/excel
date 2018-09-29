@@ -139,8 +139,6 @@ public class ExcelToBeanConverter {
         return convertBeanFromArray(arr, clazz);
     }
 
-
-
     private Object[] convertArrayByRow(Row row) throws Exception{
         int cols = row.getLastCellNum();
         Object[] arr = new Object[cols];

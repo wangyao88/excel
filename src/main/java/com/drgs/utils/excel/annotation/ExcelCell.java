@@ -12,4 +12,6 @@ import java.lang.annotation.*;
 public @interface ExcelCell {
 
     int position();
+
+    boolean nullable() default true;
 }

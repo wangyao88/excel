@@ -19,4 +19,6 @@ public @interface ExcelDateCell {
     Class<?> type() default Date.class;
 
     String partten() default "yyyy-MM-dd";
+
+    boolean nullable() default true;
 }
