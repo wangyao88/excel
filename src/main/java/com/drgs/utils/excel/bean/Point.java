@@ -1,13 +1,17 @@
 package com.drgs.utils.excel.bean;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * excel数据坐标点 sheet row
  * @author wangyao
  */
 @Data
-public class Point implements Comparable<Point>{
+@NoArgsConstructor
+public class Point implements Serializable, Comparable<Point>{
 
     private int sheet;
     private int row;

@@ -5,7 +5,6 @@ import com.drgs.utils.excel.exception.NotExcelFileException;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,7 +24,6 @@ import java.util.function.Function;
 /**
  * @author wangyao
  */
-@Slf4j
 public class Excel {
 
     private static final Set<String> EXTENSION = Sets.newHashSet(".xls","xlsx");
@@ -49,7 +47,6 @@ public class Excel {
         try {
             return Optional.of(getWorkbook(file,extension));
         }catch (IOException e) {
-            log.error("创建HSSFWorkbook失败！",e);
             return Optional.empty();
         }
     }

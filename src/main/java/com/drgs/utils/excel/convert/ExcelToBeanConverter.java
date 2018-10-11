@@ -9,7 +9,6 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import lombok.Cleanup;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,7 +23,6 @@ import java.util.Optional;
 /**
  * @author wangyao
  */
-@Slf4j
 @Data
 public class ExcelToBeanConverter {
 
@@ -62,7 +60,6 @@ public class ExcelToBeanConverter {
         try {
             file = byte2File(bytes,fileName);
         } catch (IOException e) {
-            log.error("byte2File失败！",e);
             return new Result<T>();
         }
         return getBeans(file, clazz);
@@ -74,7 +71,6 @@ public class ExcelToBeanConverter {
         try {
             workbookOptional = Excel.getWorkbook(file);
         } catch (FileNotExistsException | NotExcelFileException e) {
-            log.error(e.getMessage(),e);
             return result;
         }
         if(workbookOptional.isPresent()) {
@@ -90,7 +86,6 @@ public class ExcelToBeanConverter {
         int sheetIndex = coordinate.getSheetIndex();
         int numberOfSheets = workbook.getNumberOfSheets();
         if(sheetIndex >= numberOfSheets){
-            log.error("sheetIndex越界");
             return;
         }
         Sheet sheet = workbook.getSheetAt(sheetIndex);
