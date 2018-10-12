@@ -16,24 +16,26 @@ import java.util.Objects;
 public class ExcelDateCellConfigurater implements Configurater {
 
     @Override
-    public <T> void configure(T entity, Field field, Object[] row) {
-        try {
-            field.setAccessible(true);
-            ExcelDateCell excelDateCell = field.getAnnotation(ExcelDateCell.class);
-            int position = excelDateCell.position();
-            Object value = null;
-            int arrLength = row.length;
-            if(position < arrLength){
-                value = row[position];
-            }
-            boolean nullable = excelDateCell.nullable();
-            if(!nullable && (Objects.isNull(value ) || StringUtils.isEmpty(value+""))){
+    public <T> void configure(T entity, Field field, Object[] row) throws Exception{
+        field.setAccessible(true);
+        ExcelDateCell excelDateCell = field.getAnnotation(ExcelDateCell.class);
+        int position = excelDateCell.position();
+        Object value = null;
+        int arrLength = row.length;
+        if(position < arrLength){
+            value = row[position];
+        }
+        boolean nullable = excelDateCell.nullable();
+        if(Objects.isNull(value ) || StringUtils.isEmpty(value+"")){
+            if(nullable){
+                field.set(entity, null);
+                return;
+            }else{
                 throw new ValidateException("第"+position+"位置值不允许为空");
             }
-            DateParseStrategy dateParseStrategy = new DateParseStrategy();
-            field.set(entity, dateParseStrategy.parse(value));
-        } catch (Exception e) {
-            log.error("设置属性值失败",e);
         }
+        String partten = excelDateCell.partten();
+        DateParseStrategy dateParseStrategy = new DateParseStrategy();
+        field.set(entity, dateParseStrategy.parse(value,partten));
     }
 }
