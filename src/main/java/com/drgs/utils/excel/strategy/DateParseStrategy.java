@@ -5,7 +5,6 @@ import com.drgs.utils.excel.exception.ValidateException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 单元格解析策略
@@ -26,10 +25,5 @@ public class DateParseStrategy{
             }
         }
         throw new ValidateException("输入值非法，无法转化为日期类型");
-    }
-
-    public static void main(String[] args) {
-        Object date = new Date();
-        System.out.println(date instanceof Date);
     }
 }
