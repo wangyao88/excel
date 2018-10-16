@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +34,17 @@ public class Excel {
         CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_STRING, (cell) -> cell.getStringCellValue());
         CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_BOOLEAN, (cell) -> cell.getBooleanCellValue());
         CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_BLANK, (cell) -> StringUtils.EMPTY);
-        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_NUMERIC, (cell) -> HSSFDateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue());
+        CELL_TYPE_FUNCTION.put(Cell.CELL_TYPE_NUMERIC, (cell) -> {
+                    return getNumericCellValue(cell);
+        });
+    }
+
+    private static Object getNumericCellValue(Cell cell) {
+        if(HSSFDateUtil.isCellDateFormatted(cell)) {
+            return cell.getDateCellValue();
+        }
+        DecimalFormat df = new DecimalFormat("0.00");
+        return df.format(cell.getNumericCellValue());
     }
 
     public static Optional<Workbook> getWorkbook(File file) throws FileNotExistsException, NotExcelFileException {
