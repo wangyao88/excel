@@ -99,7 +99,6 @@ public class ExcelToBeanConverter {
         Map<Point, String> failureBeans = Maps.newConcurrentMap();
         IntStream.rangeClosed(coordinate.getStartRowIndex(),lastRowNum)
                  .parallel().forEach(i->{
-            System.out.println(Thread.currentThread().getId());
             Point point = Point.getInstance(sheetIndex,i);
             try {
                 boolean validateFlag = true;
