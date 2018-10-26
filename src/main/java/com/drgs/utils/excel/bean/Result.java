@@ -14,8 +14,8 @@ import java.util.Map;
 @NoArgsConstructor
 public class Result<T> implements Serializable {
 
-    private Map<Point, T> successBeans = Maps.newHashMap();
-    private Map<Point, String> failureBeans = Maps.newHashMap();
+    private Map<Point, T> successBeans = Maps.newConcurrentMap();
+    private Map<Point, String> failureBeans = Maps.newConcurrentMap();
     private boolean success = true;
 }
 

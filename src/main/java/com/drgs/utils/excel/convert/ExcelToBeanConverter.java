@@ -6,6 +6,7 @@ import com.drgs.utils.excel.exception.FileNotExistsException;
 import com.drgs.utils.excel.exception.NotExcelFileException;
 import com.drgs.utils.excel.validator.Validator;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import lombok.Cleanup;
 import lombok.Data;
@@ -17,8 +18,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * @author wangyao
@@ -92,7 +95,11 @@ public class ExcelToBeanConverter {
         int lastRowNum = Objects.isNull(coordinate.getEndRowIndex()) ?
                 sheet.getLastRowNum() :
                 Math.min(coordinate.getEndRowIndex(),sheet.getLastRowNum());
-        for (int i = coordinate.getStartRowIndex(); i <= lastRowNum; i++) {
+        Map<Point, T> successBeans = Maps.newConcurrentMap();
+        Map<Point, String> failureBeans = Maps.newConcurrentMap();
+        IntStream.rangeClosed(coordinate.getStartRowIndex(),lastRowNum)
+                 .parallel().forEach(i->{
+            System.out.println(Thread.currentThread().getId());
             Point point = Point.getInstance(sheetIndex,i);
             try {
                 boolean validateFlag = true;
@@ -100,21 +107,23 @@ public class ExcelToBeanConverter {
                 for(Validator validator : validators){
                     ValidateResult validateResult = validator.validate(t);
                     if(!validateResult.isResult()) {
-                        result.getFailureBeans().put(point,validateResult.getCause().getMessage());
+                        failureBeans.put(point,validateResult.getCause().getMessage());
                         result.setSuccess(false);
                         validateFlag = false;
                         break;
                     }
                 }
                 if(!validateFlag){
-                    continue;
+                    return;
                 }
-                result.getSuccessBeans().put(point,t);
+                successBeans.put(point,t);
             } catch (Exception e) {
-                result.getFailureBeans().put(point,e.getMessage());
+                failureBeans.put(point,e.getMessage());
                 result.setSuccess(false);
             }
-        }
+        });
+        result.getSuccessBeans().putAll(successBeans);
+        result.getFailureBeans().putAll(failureBeans);
     }
 
     private File byte2File(byte[] bytes, String fileName) throws IOException {
@@ -166,7 +175,7 @@ public class ExcelToBeanConverter {
         coordinates.add(coordinate2);
 
         Result<Bean> beans = ExcelToBeanConverter.getInstance().setCoordinates(coordinates).getBeans(path, Bean.class);
-        System.out.println(beans);
+        System.out.println(beans.getSuccessBeans().size());
     }
 
 }
